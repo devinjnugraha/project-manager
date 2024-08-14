@@ -9,15 +9,18 @@ export default function NewProject({ onSave, onCancel }) {
   const modal = useRef();
 
   function handleSave() {
-    if (!inputTitle.current.validate()) return;
-    if (!inputDescription.current.validate()) return;
-    if (!inputDueDate.current.validate()) return;
-    const project = {
-      title: inputTitle.current.value,
-      description: inputDescription.current.value,
-      dueDate: inputDueDate.current.value,
-    };
-    onSave(project);
+    const isTitleValid = inputTitle.current.validate();
+    const isDescriptionValid = inputDescription.current.validate();
+    const isDueDateValid = inputDueDate.current.validate();
+
+    if (isTitleValid && isDescriptionValid && isDueDateValid) {
+      const project = {
+        title: inputTitle.current.value,
+        description: inputDescription.current.value,
+        dueDate: inputDueDate.current.value,
+      };
+      onSave(project);
+    }
   }
 
   return (

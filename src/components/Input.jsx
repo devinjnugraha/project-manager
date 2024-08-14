@@ -1,8 +1,10 @@
-import { forwardRef, useState, useImperativeHandle } from 'react';
+import { forwardRef, useState, useImperativeHandle, useRef } from 'react';
 
 export default forwardRef(function Input({ label, textarea, ...props }, ref) {
   const [inputError, setInputError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  const localRef = useRef();
 
   let classes =
     'w-full p-1 border-b-2 rounded-sm border-stone-300 bg-stone-200 text-stone-600 focus:outline-none focus:border-stone-600';
@@ -13,8 +15,8 @@ export default forwardRef(function Input({ label, textarea, ...props }, ref) {
 
   // Validate function
   function validate() {
-    if (ref.current) {
-      if (props.required && !ref.current.value) {
+    if (localRef.current) {
+      if (props.required && !localRef.current.value) {
         setInputError(true);
         setErrorMessage('This field is required.');
         return false;
@@ -28,6 +30,7 @@ export default forwardRef(function Input({ label, textarea, ...props }, ref) {
 
   useImperativeHandle(ref, () => ({
     validate,
+    value: localRef.current ? localRef.current.value : '',
   }));
 
   function handleBlur() {
@@ -41,13 +44,18 @@ export default forwardRef(function Input({ label, textarea, ...props }, ref) {
       </label>
       {textarea ? (
         <textarea
-          ref={ref}
+          ref={localRef}
           className={classes}
           {...props}
           onBlur={handleBlur}
         ></textarea>
       ) : (
-        <input ref={ref} className={classes} {...props} onBlur={handleBlur} />
+        <input
+          ref={localRef}
+          className={classes}
+          {...props}
+          onBlur={handleBlur}
+        />
       )}
       {inputError && (
         <small muted className='text-red-500 font-semibold'>
