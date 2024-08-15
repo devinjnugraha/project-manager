@@ -1,9 +1,7 @@
 import { forwardRef, useState, useImperativeHandle, useRef } from 'react';
 
 export default forwardRef(function Input({ label, textarea, ...props }, ref) {
-  const [inputError, setInputError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
+  const [inputError, setInputError] = useState(null);
   const localRef = useRef();
 
   let classes =
@@ -13,24 +11,22 @@ export default forwardRef(function Input({ label, textarea, ...props }, ref) {
     classes += ' border-red-500';
   }
 
-  // Validate function
   function validate() {
     if (localRef.current) {
-      if (props.required && !localRef.current.value) {
-        setInputError(true);
-        setErrorMessage('This field is required.');
+      if (props.required && !localRef.current.value.trim()) {
+        setInputError('This field is required.');
         return false;
       } else {
-        setInputError(false);
-        setErrorMessage('');
+        setInputError(null);
         return true;
       }
     }
+    return false;
   }
 
   useImperativeHandle(ref, () => ({
     validate,
-    value: localRef.current ? localRef.current.value : '',
+    getValue: () => (localRef.current ? localRef.current.value : ''),
   }));
 
   function handleBlur() {
@@ -59,7 +55,7 @@ export default forwardRef(function Input({ label, textarea, ...props }, ref) {
       )}
       {inputError && (
         <small muted className='text-red-500 font-semibold'>
-          {errorMessage}
+          {inputError}
         </small>
       )}
     </p>
